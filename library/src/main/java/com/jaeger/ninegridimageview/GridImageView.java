@@ -8,13 +8,15 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
 /**
  * Created by Jaeger on 16/2/24.
- *
+ * <p>
  * Email: chjie.jaeger@gamil.com
  * GitHub: https://github.com/laobie
  */
-public class GridImageView extends ImageView {
+public class GridImageView extends SimpleDraweeView {
 
     public GridImageView(Context context, AttributeSet attrs) {
         super(context, attrs);

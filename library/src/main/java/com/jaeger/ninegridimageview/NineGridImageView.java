@@ -6,7 +6,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class NineGridImageView<T> extends ViewGroup {
     private int mGridSize;                      // 宫格大小,即图片大小
     private int mSpanType;                      // 跨行跨列的类型
 
-    private List<ImageView> mImageViewList = new ArrayList<>();
+    private List<SimpleDraweeView> mImageViewList = new ArrayList<>();
     private List<T> mImgDataList;
 
     private NineGridImageViewAdapter<T> mAdapter;
@@ -69,7 +71,8 @@ public class NineGridImageView<T> extends ViewGroup {
             if (mImgDataList.size() == 1 && mSingleImgSize != -1) {
                 mGridSize = mSingleImgSize > totalWidth ? totalWidth : mSingleImgSize;
             } else {
-                mImageViewList.get(0).setScaleType(ImageView.ScaleType.CENTER_CROP);
+                mImageViewList.get(0).getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FOCUS_CROP);
+//                mImageViewList.get(0).setScaleType(ImageView.ScaleType.CENTER_CROP);
                 mGridSize = (totalWidth - mGap * (mColumnCount - 1)) / mColumnCount;
             }
             height = mGridSize * mRowCount + mGap * (mRowCount - 1) + getPaddingTop() + getPaddingBottom();
@@ -116,7 +119,7 @@ public class NineGridImageView<T> extends ViewGroup {
         if (childrenCount <= 0) return;
         int row, column, left, top, right, bottom;
         for (int i = 0; i < childrenCount; i++) {
-            ImageView childrenView = (ImageView) getChildAt(i);
+            SimpleDraweeView childrenView = (SimpleDraweeView) getChildAt(i);
             row = i / mColumnCount;
             column = i % mColumnCount;
             left = (mGridSize + mGap) * column + getPaddingLeft();
@@ -133,7 +136,7 @@ public class NineGridImageView<T> extends ViewGroup {
     private void layoutForThreeChildrenView(int childrenCount) {
         int left, top, right, bottom;
         for (int i = 0; i < childrenCount; i++) {
-            ImageView childrenView = (ImageView) getChildAt(i);
+            SimpleDraweeView childrenView = (SimpleDraweeView) getChildAt(i);
             switch (mSpanType) {
                 case TOPCOLSPAN:    //2行2列,首行跨列
                     if (i == 0) {
@@ -204,7 +207,7 @@ public class NineGridImageView<T> extends ViewGroup {
     private void layoutForFourChildrenView(int childrenCount) {
         int left, top, right, bottom;
         for (int i = 0; i < childrenCount; i++) {
-            ImageView childrenView = (ImageView) getChildAt(i);
+            SimpleDraweeView childrenView = (SimpleDraweeView) getChildAt(i);
             switch (mSpanType) {
                 case TOPCOLSPAN:    //3行3列,首行跨2行3列
                     if (i == 0) {
@@ -290,7 +293,7 @@ public class NineGridImageView<T> extends ViewGroup {
     private void layoutForFiveChildrenView(int childrenCount) {
         int left, top, right, bottom;
         for (int i = 0; i < childrenCount; i++) {
-            ImageView childrenView = (ImageView) getChildAt(i);
+            SimpleDraweeView childrenView = (SimpleDraweeView) getChildAt(i);
             switch (mSpanType) {
                 case TOPCOLSPAN:    //3行3列,首行跨2行,2列跨3列
                     if (i == 0) {
@@ -391,7 +394,7 @@ public class NineGridImageView<T> extends ViewGroup {
     private void layoutForSixChildrenView(int childrenCount) {
         int left, top, right, bottom;
         for (int i = 0; i < childrenCount; i++) {
-            ImageView childrenView = (ImageView) getChildAt(i);
+            SimpleDraweeView childrenView = (SimpleDraweeView) getChildAt(i);
             switch (mSpanType) {
                 case TOPCOLSPAN:    //3行3列,第一张跨2行2列
                     if (i == 0) {
@@ -574,7 +577,7 @@ public class NineGridImageView<T> extends ViewGroup {
         if (mImgDataList == null) {
             int i = 0;
             while (i < newShowCount) {
-                ImageView iv = getImageView(i);
+                SimpleDraweeView iv = getImageView(i);
                 if (iv == null) {
                     return;
                 }
@@ -587,7 +590,7 @@ public class NineGridImageView<T> extends ViewGroup {
                 removeViews(newShowCount, oldShowCount - newShowCount);
             } else if (oldShowCount < newShowCount) {
                 for (int i = oldShowCount; i < newShowCount; i++) {
-                    ImageView iv = getImageView(i);
+                    SimpleDraweeView iv = getImageView(i);
                     if (iv == null) {
                         return;
                     }
@@ -613,28 +616,28 @@ public class NineGridImageView<T> extends ViewGroup {
      *
      * @param position 位置
      */
-    private ImageView getImageView(final int position) {
+    private SimpleDraweeView getImageView(final int position) {
         if (position < mImageViewList.size()) {
             return mImageViewList.get(position);
         } else {
             if (mAdapter != null) {
-                ImageView imageView = mAdapter.generateImageView(getContext());
+                SimpleDraweeView imageView = mAdapter.generateImageView(getContext());
                 mImageViewList.add(imageView);
                 imageView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mAdapter.onItemImageClick(getContext(), (ImageView) v, position, mImgDataList);
+                        mAdapter.onItemImageClick(getContext(), (SimpleDraweeView) v, position, mImgDataList);
                         if (mItemImageClickListener != null) {
-                            mItemImageClickListener.onItemImageClick(getContext(), (ImageView) v, position, mImgDataList);
+                            mItemImageClickListener.onItemImageClick(getContext(), (SimpleDraweeView) v, position, mImgDataList);
                         }
                     }
                 });
                 imageView.setOnLongClickListener(new OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        boolean consumedEvent = mAdapter.onItemImageLongClick(getContext(), (ImageView) v, position, mImgDataList);
+                        boolean consumedEvent = mAdapter.onItemImageLongClick(getContext(), (SimpleDraweeView) v, position, mImgDataList);
                         if (mItemImageLongClickListener != null) {
-                            consumedEvent = mItemImageLongClickListener.onItemImageLongClick(getContext(), (ImageView) v, position, mImgDataList) || consumedEvent;
+                            consumedEvent = mItemImageLongClickListener.onItemImageLongClick(getContext(), (SimpleDraweeView) v, position, mImgDataList) || consumedEvent;
                         }
                         return consumedEvent;
                     }
