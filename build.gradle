@@ -15,6 +15,7 @@ apply plugin: 'com.jfrog.bintray'
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
 }
 
